@@ -1,12 +1,14 @@
 import styles from '../../styles/Admin.module.css';
 import AuthCheck from '../../components/AuthCheck';
 import { firestore, auth, serverTimestamp } from '../../lib/firebase';
+import ImageUploader from '../../components/ImageUploader';
 
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { useDocumentData } from 'react-firebase-hooks/firestore';
-import { useForm } from 'react-hook-form';
+import { useForm, useFormState } from 'react-hook-form';
+import { ErrorMessage } from '@hookform/error-message'; // install and import error-message
 import ReactMarkdown from 'react-markdown';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
@@ -53,7 +55,10 @@ function PostManager() {
 }
 
 function PostForm({ defaultValues, postRef, preview }) {
-  const { register, handleSubmit, reset, watch } = useForm({ defaultValues, mode: 'onChange' });
+    const { register, handleSubmit, reset, watch, formState: { errors }, control } = useForm({ defaultValues, mode: 'onChange' });
+    const { isValid, isDirty } = useFormState({
+        control
+    });
 
   const updatePost = async ({ content, published }) => {
     await postRef.update({
@@ -67,6 +72,8 @@ function PostForm({ defaultValues, postRef, preview }) {
     toast.success('Post updated successfully!')
   };
 
+  console.log(isValid)
+  console.log(isDirty)
   return (
     <form onSubmit={handleSubmit(updatePost)}>
       {preview && (
@@ -76,15 +83,30 @@ function PostForm({ defaultValues, postRef, preview }) {
       )}
 
       <div className={preview ? styles.hidden : styles.controls}>
-  
-        <textarea name="content" {...register('content')}></textarea>
+      <ImageUploader />
+      <textarea {...register("content", {            
+            required: "content is required",
+                    maxLength: {
+                        value: 20000,
+                        message: 'content is too long'
+                    },
+                    minLength: {
+                        value: 10,
+                        message: 'content is too short'
+                    }
+                })}></textarea>
+        <ErrorMessage
+            errors={errors}
+            name="content"
+            render={({ message }) => <p className="text-danger">{message}</p>}
+        />
 
         <fieldset>
           <input className={styles.checkbox} name="published" type="checkbox" {...register('published')} />
           <label>Published</label>
         </fieldset>
 
-        <button type="submit" className="btn-green">
+         <button type="submit" className="btn-green" disabled={!isDirty || !isValid}>
           Save Changes
         </button>
       </div>

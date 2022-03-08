@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/error-message": "^2.0.0",
+    "error-message": "^1.0.13",
     "firebase": "^8.2.1",
     "lodash.debounce": "^4.0.8",
     "lodash.kebabcase": "^4.1.1",
