@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { useContext } from 'react';
 import { UserContext } from '../lib/context';
-
+import Metatags from './Metatags';
 // Top navbar
 export default function Navbar() {
   const { user, username } = useContext(UserContext)
 
   return (
+    <>
+    <Metatags />
     <nav className="navbar">
       <ul>
         <li>
@@ -41,5 +43,6 @@ export default function Navbar() {
         )}
       </ul>
     </nav>
+    </>
   );
 }
