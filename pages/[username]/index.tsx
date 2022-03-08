@@ -11,6 +11,13 @@ export async function getServerSideProps({ query }) {
   let user = null;
   let posts = null;
 
+  // If no user, short circuit to 404 page
+  if (!userDoc) {
+    return {
+      notFound: true,
+    };
+  }
+
   if (userDoc) {
     user = userDoc.data();
     const postsQuery = userDoc.ref
